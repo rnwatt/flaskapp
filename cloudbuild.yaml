@@ -1,0 +1,9 @@
+##Build Pipeline
+
+#Get theme (from submodule)
+
+#Build site
+
+#Build and Push Container
+
+#Stop Running Container and Start New Container
