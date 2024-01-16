@@ -1,9 +1,16 @@
 from datetime import *
 import time
 import sys
-
+import telnetlib
+import random
 import json
 import requests
+import subprocess
+
+
+
+
+
 # First we set our credentials
 
 from flask import Flask, request, session, g, redirect, url_for, abort, \
@@ -11,10 +18,52 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
 app = Flask(__name__)
 app.debug = True
 
+
+
+telnet_host = "34.78.74.11"
+telnet_port = 80
+
+def get_recommendations():
+    try:
+        # Create a Telnet object
+        tn = telnetlib.Telnet(telnet_host, telnet_port, timeout=5)
+
+        # Replace the following line with your logic to generate a random number
+        random_number = str(random.randint(1, 400))
+
+        # Send the random number to telnet
+        tn.write(f"{random_number}\n".encode('ascii'))
+
+        # Read the output from telnet
+        telnet_output = tn.read_until(b"\r\n", timeout=5).decode('utf-8')
+        # Close the telnet connection
+        tn.close()
+
+        # Print the telnet output for debugging
+        print("Telnet Output:", telnet_output)
+
+        return telnet_output
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+
+def parse_recommendations(recommendations):
+    recommendations_list = []
+    lines = recommendations.split('\n')[1:-1]  # Skip the first and last lines
+    for line in lines:
+        parts = line.split(':')
+        if len(parts) == 2:
+            title, genres = parts[0], parts[1]
+            recommendations_list.append({'title': title, 'genres': genres})
+    return recommendations_list
+
+
+
 @app.route('/Video/<video>')
 def video_page(video):
     print (video)
-    url = 'http://34.173.227.154/myflix/videos?filter={"video.uuid":"'+video+'"}'
+    url = 'http://34.140.45.82/myflix/videos?filter={"video.uuid":"'+video+'"}'
     headers = {}
     payload = json.dumps({ })
     print (request.endpoint)
@@ -38,49 +87,56 @@ def video_page(video):
                       videofile=index[key][key2]
                   if (key2=="pic"):
                       pic=index[key][key2]
+
     return render_template('video.html', name=video,file=videofile,pic=pic)
+
 
 @app.route('/')
 def cat_page():
-    url = "http://34.173.227.154/myflix/videos"
+    url = "http://34.140.45.82/myflix/videos"
     headers = {}
     payload = json.dumps({ })
 
     response = requests.get(url)
-    #print (response)
-    # exit if status code is not ok
-    print (response)
-    print (response.status_code)
+    print(response)
+    print(response.status_code)
     if response.status_code != 200:
-      print("Unexpected response: {0}. Status: {1}. Message: {2}".format(response.reason, response.status, jResp['Exception']['Message']))
-      return "Unexpected response: {0}. Status: {1}. Message: {2}".format(response.reason, response.status, jResp['Exception']['Message'])
-    jResp = response.json()
-    print (type(jResp))
-    html="<h2> Your Videos</h2>"
-    for index in jResp:
-       #print (json.dumps(index))
-       print ("----------------")
-       for key in index:
+        print("Unexpected response:", response)
+        return "Unexpected response from myflix service."
 
-           if (key !="_id"):
-              print (index[key])
-              for key2 in index[key]:
-                  print (key2,index[key][key2])
-                  if (key2=="Name"):
-                      name=index[key][key2]
-                  if (key2=="thumb"):
-                      thumb=index[key][key2]
-                  if (key2=="uuid"):
-                      uuid=index[key][key2]  
-              html=html+'<h3>'+name+'</h3>'
-              ServerIP=request.host.split(':')[0]
-              html=html+'<a href="http://'+ServerIP+'/Video/'+uuid+'">'
-              html=html+'<img src="http://35.228.145.155/pics/'+thumb+'">'
-              html=html+"</a>"        
-              print("=======================")
+    jResp = response.json()
+    print(type(jResp))
+    html = "<h2> Your Videos</h2>"
+    for index in jResp:
+        print("----------------")
+        for key in index:
+            if key != "_id":
+                print(index[key])
+                for key2 in index[key]:
+                    print(key2, index[key][key2])
+                    if key2 == "Name":
+                        name = index[key][key2]
+                    if key2 == "thumb":
+                        thumb = index[key][key2]
+                    if key2 == "uuid":
+                        uuid = index[key][key2]
+                html += '<h3>' + name + '</h3>'
+                ServerIP = request.host.split(':')[0]
+                html += '<a href="http://' + ServerIP + '/Video/' + uuid + '">'
+                html += '<img src="http://34.140.135.22/pics/' + thumb + '">'
+                html += "</a>"
+                print("=======================")
+
+    recommendations = get_recommendations()
+
+
+    html += "<h2>Recommended Movies!</h2>"
+
+    if recommendations is not None:
+        html += "<pre>" + recommendations + "</pre>"
 
     return html
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port="80")
+    app.run(host='0.0.0.0',port="5000")
