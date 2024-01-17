@@ -1,0 +1,17 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-t"
+      - "gcr.io/ultra-function-402414/flaskapp"
+      - "."
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "push"
+      - "gcr.io/ultra-function-402414/flaskapp"
+
+images:
+  - "gcr.io/ultra-function-402414/flaskapp"
+
+options:
+  logging: "CLOUD_LOGGING_ONLY"
