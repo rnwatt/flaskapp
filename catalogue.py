@@ -130,7 +130,7 @@ def cat_page():
     recommendations = get_recommendations()
 
 
-    html += "<h2>Recommended Movies!</h2>"
+    html += "<h2>Recommended Movies! CI</h2>"
 
     if recommendations is not None:
         html += "<pre>" + recommendations + "</pre>"
