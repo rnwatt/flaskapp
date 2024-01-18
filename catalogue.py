@@ -106,7 +106,7 @@ def cat_page():
 
     jResp = response.json()
     print(type(jResp))
-    html = "<h2> Your Videos ci/cd</h2>"
+    html = "<h2> Your Videos</h2>"
     for index in jResp:
         print("----------------")
         for key in index:
@@ -129,13 +129,7 @@ def cat_page():
 
     recommendations = get_recommendations()
 
-
-<<<<<<< HEAD
-    html += "<h2>Movie Recommendations: </h2>"
-=======
-    html += "<h2>Recommended Movies! </h2>"
->>>>>>> 8fe6f1b5519ba783b9affe26632fb1b4e65d295c
-
+    html += "<h2>Movie Recommendations: </h2>
     if recommendations is not None:
         html += "<pre>" + recommendations + "</pre>"
 
