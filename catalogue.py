@@ -25,21 +25,11 @@ telnet_port = 80
 
 def get_recommendations():
     try:
-        # Create a Telnet object
         tn = telnetlib.Telnet(telnet_host, telnet_port, timeout=5)
-
-        # Replace the following line with your logic to generate a random number
         random_number = str(random.randint(1, 400))
-
-        # Send the random number to telnet
         tn.write(f"{random_number}\n".encode('ascii'))
-
-        # Read the output from telnet
         telnet_output = tn.read_until(b"\r\n", timeout=5).decode('utf-8')
-        # Close the telnet connection
         tn.close()
-
-        # Print the telnet output for debugging
         print("Telnet Output:", telnet_output)
 
         return telnet_output
