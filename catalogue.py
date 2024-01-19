@@ -96,7 +96,7 @@ def cat_page():
 
     jResp = response.json()
     print(type(jResp))
-    html = "<h2>ci/cd Your Videos</h2>"
+    html = "<h2> DEVOPS Your Videos</h2>"
     for index in jResp:
         print("----------------")
         for key in index:
